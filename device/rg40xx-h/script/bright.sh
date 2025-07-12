@@ -19,8 +19,14 @@ SET_BLANK() {
 	echo "$TARGET_BLANK" >"$FB_BLANK"
 
 	case "$TARGET_BLANK" in
-		4) touch /tmp/mux_blank ;;
-		*) rm -f /tmp/mux_blank ;;
+		4)
+			touch /tmp/mux_blank
+			LCD_DISABLE
+			;;
+		*)
+			rm -f /tmp/mux_blank
+			[ "$CURR_BRIGHT" -lt 5 ] && LCD_ENABLE
+			;;
 	esac
 }
 
@@ -51,6 +57,9 @@ case "$1" in
 		[ "$CURR_BRIGHT" -le 15 ] && NEW_BL=$((CURR_BRIGHT - 1)) || NEW_BL=$((CURR_BRIGHT - 15))
 		[ "$NEW_BL" -lt 0 ] && NEW_BL=0
 		SET_CURRENT "$NEW_BL"
+		;;
+	F)
+		LCD_DISABLE && /opt/muos/bin/toybox sleep 1 && LCD_ENABLE
 		;;
 	[0-9]*)
 		[ "$1" -eq "$1" ] 2>/dev/null && [ "$1" -ge 0 ] && [ "$1" -le "$MAX_BRIGHT" ] && SET_CURRENT "$1"
